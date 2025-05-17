@@ -1,22 +1,80 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Wingo Live Results & Prediction</title>
+  <style>
+    body { font-family: Arial; padding: 20px; background: #f9f9f9; color: #333; }
+    h1 { color: #ff5733; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 8px 12px; border: 1px solid #ccc; text-align: center; }
+    th { background-color: #f2f2f2; }
+    .prediction { margin-top: 20px; font-size: 1.2em; font-weight: bold; }
+  </style>
 </head>
 <body>
   <h1>Wingo Live Results & Prediction</h1>
-  <div id="result">Loading...</div>
+  <div id="error" style="color: red;"></div>
+  <table>
+    <thead>
+      <tr>
+        <th>Period</th>
+        <th>Number</th>
+        <th>Big/Small</th>
+        <th>Color</th>
+      </tr>
+    </thead>
+    <tbody id="results-body"></tbody>
+  </table>
+
+  <div class="prediction" id="prediction">Loading prediction...</div>
 
   <script>
-    fetch('https://onemins-wingo.onrender.com/latest')
-      .then(response => response.json())
-      .then(data => {
-        document.getElementById('result').innerText = `Latest Result: ${data.result}`;
-      })
-      .catch(error => {
-        document.getElementById('result').innerText = 'Error fetching data.';
-        console.error(error);
-      });
+    async function fetchResults() {
+      try {
+        const res = await fetch('https://onemins-wingo.onrender.com/api/results');
+        const data = await res.json();
+        const tbody = document.getElementById('results-body');
+        tbody.innerHTML = '';
+
+        data.results.forEach(r => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${r.period}</td>
+            <td>${r.number}</td>
+            <td>${r.bigSmall}</td>
+            <td>${r.color}</td>
+          `;
+          tbody.appendChild(row);
+        });
+
+        document.getElementById('error').innerText = '';
+      } catch (err) {
+        document.getElementById('error').innerText = 'Error fetching results.';
+      }
+    }
+
+    async function fetchPrediction() {
+      try {
+        const res = await fetch('https://onemins-wingo.onrender.com/api/predict');
+        const data = await res.json();
+        document.getElementById('prediction').innerText = `Next Prediction: ${data.prediction}`;
+      } catch (err) {
+        document.getElementById('prediction').innerText = 'Error fetching prediction.';
+      }
+    }
+
+    function updateLive() {
+      fetchResults();
+      fetchPrediction();
+    }
+
+    // Initial load
+    updateLive();
+
+    // Refresh every 60 seconds
+    setInterval(updateLive, 60000);
   </script>
 </body>
 </html>
