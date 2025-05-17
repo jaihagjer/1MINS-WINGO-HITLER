@@ -1,48 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Wingo Prediction</title>
-  <style>
-    body { font-family: sans-serif; text-align: center; margin-top: 50px; }
-    .result, .prediction { font-size: 24px; margin: 10px 0; }
-  </style>
+  <title>1Mins Wingo Predictor</title>
 </head>
 <body>
-  <h1>1 Min Wingo Live Results</h1>
-  <div class="result" id="result">Loading...</div>
-  <div class="prediction" id="prediction">Predicting...</div>
+  <h1>Wingo Live Results & Prediction</h1>
+  <div id="results">Loading latest result...</div>
+  <div id="prediction">Calculating next prediction...</div>
 
   <script>
-    async function fetchResults() {
+    async function getWingoData() {
       try {
-        const res = await fetch('https://onemins-wingo.onrender.com/results');
+        const res = await fetch("https://onemins-wingo.onrender.com");
         const data = await res.json();
-        
-        const latest = data.slice(-5); // Last 5 results
-        const resultText = latest.map(r => r.result).join(' - ');
-        document.getElementById("result").innerText = "Last Results: " + resultText;
-
-        // Prediction logic
-        const bigCount = latest.filter(r => r.result === 'Big').length;
-        const smallCount = latest.filter(r => r.result === 'Small').length;
-
-        let prediction = "Unknown";
-        if (bigCount > smallCount) prediction = "Next Prediction: Small";
-        else if (smallCount > bigCount) prediction = "Next Prediction: Big";
-        else prediction = "Next Prediction: Random";
-
-        document.getElementById("prediction").innerText = prediction;
-
-      } catch (err) {
-        document.getElementById("result").innerText = "Error fetching data.";
+        document.getElementById("results").innerText = "Latest Result: " + data.latest;
+        document.getElementById("prediction").innerText = "Next Prediction: " + data.prediction;
+      } catch (error) {
+        document.getElementById("results").innerText = "Error fetching data.";
         document.getElementById("prediction").innerText = "";
       }
     }
 
-    fetchResults();
-    setInterval(fetchResults, 60000); // every 60 seconds
+    getWingoData();
+    setInterval(getWingoData, 60000); // Update every minute
   </script>
 </body>
 </html>
