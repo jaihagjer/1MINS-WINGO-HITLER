@@ -1,28 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>1Mins Wingo Predictor</title>
+  <title>Wingo Live Results & Prediction</title>
 </head>
 <body>
   <h1>Wingo Live Results & Prediction</h1>
-  <div id="results">Loading latest result...</div>
-  <div id="prediction">Calculating next prediction...</div>
+  <div id="result">Loading...</div>
 
   <script>
-    async function getWingoData() {
-      try {
-        const res = await fetch("https://onemins-wingo.onrender.com");
-        const data = await res.json();
-        document.getElementById("results").innerText = "Latest Result: " + data.latest;
-        document.getElementById("prediction").innerText = "Next Prediction: " + data.prediction;
-      } catch (error) {
-        document.getElementById("results").innerText = "Error fetching data.";
-        document.getElementById("prediction").innerText = "";
-      }
-    }
-
-    getWingoData();
-    setInterval(getWingoData, 60000); // Update every minute
+    fetch('https://onemins-wingo.onrender.com/latest')
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('result').innerText = `Latest Result: ${data.result}`;
+      })
+      .catch(error => {
+        document.getElementById('result').innerText = 'Error fetching data.';
+        console.error(error);
+      });
   </script>
 </body>
 </html>
